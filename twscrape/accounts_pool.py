@@ -351,6 +351,8 @@ class AccountsPool:
             ("total", "SELECT COUNT(*) FROM accounts"),
             ("active", "SELECT COUNT(*) FROM accounts WHERE active = true"),
             ("inactive", "SELECT COUNT(*) FROM accounts WHERE active = false"),
+            ("ocf_arkose_challenge", "SELECT COUNT(*) FROM accounts WHERE ocf_arkose_challenge > 0"),
+            ("login_failed", "SELECT COUNT(*) FROM accounts WHERE login_failed >= 10"),
             *[(f"locked_{x}", locks_count(x)) for x in gql_ops],
         ]
 
@@ -369,6 +371,8 @@ class AccountsPool:
                 "active": x.active,
                 "last_used": x.last_used,
                 "total_req": sum(x.stats.values()),
+                "ocf": x.ocf_arkose_challenge,
+                "login_failed": x.login_failed,
                 "error_msg": str(x.error_msg)[0:60],
             }
             items.append(item)

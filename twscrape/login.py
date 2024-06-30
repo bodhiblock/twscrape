@@ -241,6 +241,11 @@ async def next_login_task(ctx: TaskCtx, rep: Response):
                 return await login_instrumentation(ctx)
             if task_id == "LoginEnterAlternateIdentifierSubtask":
                 return await login_alternate_identifier(ctx, username=ctx.acc.username)
+            if task_id == "ArkoseLogin":
+                ctx.acc.error_msg = f"login_step={task_id} err=ocf_arkose_challenge"
+                ctx.acc.ocf_arkose_challenge += 1
+                return None
+            
         except Exception as e:
             ctx.acc.error_msg = f"login_step={task_id} err={e}"
             raise e
@@ -269,11 +274,20 @@ async def login(acc: Account, cfg: LoginConfig | None = None) -> Account:
             if not rep:
                 break
 
-        assert "ct0" in client.cookies, "ct0 not in cookies (most likely ip ban)"
+        if ctx.acc.ocf_arkose_challenge:
+            acc.login_failed += 1
+            raise ValueError("ocf_arkose_challenge")
+
+        if "ct0" not in client.cookies:
+            acc.login_failed += 1
+            raise ValueError("ct0 not in cookies")
+        
         client.headers["x-csrf-token"] = client.cookies["ct0"]
         client.headers["x-twitter-auth-type"] = "OAuth2Session"
 
         acc.active = True
+        acc.ocf_arkose_challenge = 0
+        acc.login_failed = 0
         acc.headers = {k: v for k, v in client.headers.items()}
         acc.cookies = {k: v for k, v in client.cookies.items()}
         return acc

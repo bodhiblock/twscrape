@@ -29,6 +29,8 @@ class Account(JSONTrait):
     error_msg: str | None = None
     last_used: datetime | None = None
     _tx: str | None = None
+    ocf_arkose_challenge: int = 0
+    login_failed: int = 0
 
     @staticmethod
     def from_rs(rs: sqlite3.Row):
@@ -38,6 +40,8 @@ class Account(JSONTrait):
         doc["headers"] = json.loads(doc["headers"])
         doc["cookies"] = json.loads(doc["cookies"])
         doc["active"] = bool(doc["active"])
+        doc["ocf_arkose_challenge"] = int(doc["ocf_arkose_challenge"])
+        doc["login_failed"] = int(doc["login_failed"])
         doc["last_used"] = utc.from_iso(doc["last_used"]) if doc["last_used"] else None
         return Account(**doc)
 
