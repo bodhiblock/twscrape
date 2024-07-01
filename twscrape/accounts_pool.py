@@ -352,7 +352,9 @@ class AccountsPool:
             ("active", "SELECT COUNT(*) FROM accounts WHERE active = true"),
             ("inactive", "SELECT COUNT(*) FROM accounts WHERE active = false"),
             ("ocf_arkose_challenge", "SELECT COUNT(*) FROM accounts WHERE ocf_arkose_challenge > 0"),
-            ("login_failed", "SELECT COUNT(*) FROM accounts WHERE login_failed >= 10"),
+            ("login_failed", "SELECT COUNT(*) FROM accounts WHERE login_failed >= 1"),
+            ("login_failed10", "SELECT COUNT(*) FROM accounts WHERE login_failed >= 10"),
+            ("need_login", "SELECT COUNT(*) FROM accounts WHERE active = false AND login_failed < 10"),
             *[(f"locked_{x}", locks_count(x)) for x in gql_ops],
         ]
 

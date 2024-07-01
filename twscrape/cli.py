@@ -60,7 +60,7 @@ async def main(args):
 
     if args.command == "stats":
         rep = await pool.stats()
-        total, active, inactive, ocf_arkose_challenge, login_failed = rep["total"], rep["active"], rep["inactive"], rep["ocf_arkose_challenge"], rep["login_failed"]
+        total, active, inactive, ocf_arkose_challenge, login_failed, login_failed10, need_login = rep["total"], rep["active"], rep["inactive"], rep["ocf_arkose_challenge"], rep["login_failed"], rep["login_failed10"], rep["need_login"]
 
         res = []
         for k, v in rep.items():
@@ -70,7 +70,7 @@ async def main(args):
 
         res = sorted(res, key=lambda x: x["locked"], reverse=True)
         print_table(res, hr_after=True)
-        print(f"Total: {total} - Active: {active} - Inactive: {inactive} - OCFArkoseChallenge: {ocf_arkose_challenge} - LoginFailed: {login_failed}")
+        print(f"Total: {total} - Active: {active} - Inactive: {inactive} - OCFArkoseChallenge: {ocf_arkose_challenge} - LoginFailed: {login_failed} - LoginFailed10: {login_failed10} - NeedLogin: {need_login}")
         return
 
     if args.command == "add_accounts":
